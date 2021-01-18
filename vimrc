@@ -16,6 +16,7 @@ set autowrite     " Automatically :write before running commands
 set modelines=0   " Disable modelines as a security precaution
 set nomodeline
 set cursorline
+set ignorecase
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -148,21 +149,9 @@ nnoremap [r :ALEPreviousWrap<CR>
 " Map Ctrl + p to open fuzzy find (FZF)
 nnoremap <c-p> :FZF!<cr>
 
-" --column: Show column number
-" --line-number: Show line number
-" --no-heading: Do not show file headings in results
-" --fixed-strings: Search term as a literal string
-" --ignore-case: Case insensitive search
-" --no-ignore: Do not respect .gitignore, etc...
-" --hidden: Search hidden files and folders
-" --follow: Follow symlinks
-" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
-" --color: Search color options
-" --fixed-literals: Search without regex, exact match
-command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" --fixed-literals'.shellescape(<q-args>), 1, <bang>0)
-
 " Search in files (FZF)
 nnoremap <silent> <Leader>f :Rg<CR>
+set grepprg=rg\ --vimgrep\ --smart-case\ --follow
 
 " Set spellfile to location that is guaranteed to exist, can be symlinked to
 " Dropbox or kept in Git and managed outside of thoughtbot/dotfiles using rcm.
@@ -193,6 +182,8 @@ call plug#begin()
   Plug 'dense-analysis/ale'
   Plug 'wakatime/vim-wakatime'
   Plug 'rking/ag.vim'
+  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 call plug#end()
 
 
