@@ -184,6 +184,7 @@ call plug#begin()
   Plug 'rking/ag.vim'
   Plug 'junegunn/fzf.vim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/vim-easy-align'
 call plug#end()
 
 
@@ -212,3 +213,20 @@ set clipboard+=unnamed
 :nnoremap <Leader>w :w<CR>
 :nnoremap <Leader>c :let @+=expand('%:p')<CR>
 
+" Map leader + l => turn cursorline off / Makes scrolling in big files way
+" faster
+:nnoremap <Leader>l :set cursorline!<CR>
+
+" NERDTree
+:nnoremap <Leader>n :NERDTreeToggle<CR>
+
+" Fold
+set foldmethod=syntax
+set foldlevel=20
+set foldclose=all
+
+" easy-align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
