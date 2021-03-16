@@ -15,8 +15,10 @@ set laststatus=2  " Always display the status line
 set autowrite     " Automatically :write before running commands
 set modelines=0   " Disable modelines as a security precaution
 set nomodeline
-set cursorline
+set nocursorline
 set ignorecase
+set ttyfast
+set lazyredraw
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -185,6 +187,7 @@ call plug#begin()
   Plug 'junegunn/fzf.vim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/vim-easy-align'
+  Plug 'godlygeek/tabular'
 call plug#end()
 
 
@@ -218,10 +221,9 @@ set clipboard+=unnamed
 :nnoremap <Leader>l :set cursorline!<CR>
 
 " NERDTree
-:nnoremap <Leader>n :NERDTreeToggle<CR>
+:nnoremap <Leader>n :NERDTreeFind<CR>
 
 " Fold
-set foldmethod=syntax
 set foldlevel=20
 set foldclose=all
 
