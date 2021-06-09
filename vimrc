@@ -188,6 +188,7 @@ call plug#begin()
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/vim-easy-align'
   Plug 'godlygeek/tabular'
+  Plug 'tpope/vim-fugitive'
 call plug#end()
 
 
