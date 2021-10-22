@@ -189,6 +189,12 @@ call plug#begin()
   Plug 'junegunn/vim-easy-align'
   Plug 'godlygeek/tabular'
   Plug 'tpope/vim-fugitive'
+  Plug 'gabrielelana/vim-markdown'
+  Plug 'skanehira/preview-markdown.vim'
+  if has("nvim")
+    Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'tanvirtin/monokai.nvim'
+  endif
 call plug#end()
 
 
@@ -211,10 +217,9 @@ noremap \ :Commentary<CR>
 autocmd FileType ruby setlocal commentstring=#\ %s
 
 " Always use the standard clipboard instead of the register
-set clipboard+=unnamed
+set clipboard=unnamedplus
 
 " Map leader + c => to copy current filepath
-:nnoremap <Leader>w :w<CR>
 :nnoremap <Leader>c :let @+=expand('%:p')<CR>
 
 " Map leader + l => turn cursorline off / Makes scrolling in big files way
