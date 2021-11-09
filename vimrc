@@ -194,6 +194,7 @@ call plug#begin()
   if has("nvim")
     Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
+    Plug 'f-person/git-blame.nvim'
   endif
 call plug#end()
 
@@ -238,3 +239,6 @@ set foldclose=all
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+
+" Turn off git blame by default
+let g:gitblame_enabled = 0
