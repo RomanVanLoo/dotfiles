@@ -183,7 +183,6 @@ call plug#begin()
   Plug 'airblade/vim-gitgutter'
   Plug 'tpope/vim-fireplace'
   Plug 'dense-analysis/ale'
-  Plug 'wakatime/vim-wakatime'
   Plug 'rking/ag.vim'
   Plug 'junegunn/fzf.vim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
