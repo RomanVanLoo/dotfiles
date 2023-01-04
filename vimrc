@@ -191,6 +191,7 @@ call plug#begin()
   Plug 'tpope/vim-fugitive'
   Plug 'gabrielelana/vim-markdown'
   Plug 'skanehira/preview-markdown.vim'
+  Plug 'dense-analysis/ale'
   if has("nvim")
     Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
@@ -242,3 +243,15 @@ nmap ga <Plug>(EasyAlign)
 
 " Turn off git blame by default
 let g:gitblame_enabled = 0
+
+# Auto linting on save
+" ALE - Auto linting/fixing
+let g:ale_fixers = {
+   'ruby': ['standardrb'],
+   'typescript': ['eslint'],
+   'javascript': ['eslint'],
+}
+let g:ale_linters = {
+   'ruby': ['standardrb'],
+}
+let g:ale_fix_on_save = 1
