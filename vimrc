@@ -58,23 +58,6 @@ augroup vimrcEx
   autocmd BufRead,BufNewFile vimrc.local set filetype=vim
 augroup END
 
-" ALE linting events
-augroup ale
-  autocmd!
-
-  if g:has_async
-    autocmd VimEnter *
-      \ set updatetime=1000 |
-      \ let g:ale_lint_on_text_changed = 0
-    autocmd CursorHold * call ale#Queue(0)
-    autocmd CursorHoldI * call ale#Queue(0)
-    autocmd InsertEnter * call ale#Queue(0)
-    autocmd InsertLeave * call ale#Queue(0)
-  else
-    echoerr "The thoughtbot dotfiles require NeoVim or Vim 8"
-  endif
-augroup END
-
 " When the type of shell script is /bin/sh, assume a POSIX-compatible
 " shell for syntax highlighting purposes.
 let g:is_posix = 1
@@ -145,10 +128,6 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
-" Move between linting errors
-nnoremap ]r :ALENextWrap<CR>
-nnoremap [r :ALEPreviousWrap<CR>
-
 " Map Ctrl + p to open fuzzy find (FZF)
 nnoremap <c-p> :FZF!<cr>
 
@@ -174,8 +153,6 @@ if filereadable($HOME . "/.vimrc.local")
   source ~/.vimrc.local
 endif
 
-let g:ale_set_highlights = 0 " Disable Highlighting
-
 call plug#begin()
   Plug 'christoomey/vim-tmux-navigator'
   Plug 'tpope/vim-commentary'
@@ -191,9 +168,10 @@ call plug#begin()
   Plug 'tpope/vim-fugitive'
   Plug 'gabrielelana/vim-markdown'
   Plug 'skanehira/preview-markdown.vim'
-  Plug 'dense-analysis/ale'
+  Plug 'preservim/nerdtree'
+  Plug 'thoughtbot/vim-rspec'
   if has("nvim")
-    Plug 'nvim-treesitter/nvim-treesitter'
+    " Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
     Plug 'f-person/git-blame.nvim'
   endif
@@ -231,6 +209,18 @@ set clipboard=unnamedplus
 " NERDTree
 :nnoremap <Leader>n :NERDTreeFind<CR>
 
+" Mappings for vim-rspec
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>y :call RunNearestSpec()<CR>
+
+let g:rspec_command = "!docker compose run --rm --name web-rspec web bundle exec rspec {spec}"
+
+" Set bar width for NERDTree
+let g:NERDTreeWinSize=60
+let g:NERDTreeQuitOnOpen = 1
+let g:NERDTreeAutoDeleteBuffer = 1
+let g:NERDTreeMinimalUI = 1
+
 " Fold
 set foldlevel=20
 set foldclose=all
@@ -244,14 +234,9 @@ nmap ga <Plug>(EasyAlign)
 " Turn off git blame by default
 let g:gitblame_enabled = 0
 
-# Auto linting on save
 " ALE - Auto linting/fixing
-let g:ale_fixers = {
-   'ruby': ['standardrb'],
-   'typescript': ['eslint'],
-   'javascript': ['eslint'],
-}
-let g:ale_linters = {
-   'ruby': ['standardrb'],
-}
+let g:ale_fixers = {'ruby': ['standardrb'], 'typescript': ['eslint'], 'javascript': ['eslint']}
+let g:ale_linters = {'ruby': ['standardrb']}
 let g:ale_fix_on_save = 1
+
+
