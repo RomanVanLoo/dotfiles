@@ -174,6 +174,7 @@ call plug#begin()
     " Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
     Plug 'f-person/git-blame.nvim'
+    Plug 'github/copilot.vim'
   endif
 call plug#end()
 
