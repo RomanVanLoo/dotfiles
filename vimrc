@@ -173,6 +173,7 @@ call plug#begin()
   if has("nvim")
     " Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
+    Plug 'polirritmico/monokai-nightasty.nvim'
     Plug 'f-person/git-blame.nvim'
     Plug 'github/copilot.vim'
   endif
@@ -240,4 +241,8 @@ let g:ale_fixers = {'ruby': ['standardrb'], 'typescript': ['eslint'], 'javascrip
 let g:ale_linters = {'ruby': ['standardrb']}
 let g:ale_fix_on_save = 1
 
+" Define the :Dark command to switch to monokai-nightasty and toggle light mode
+command! Light execute 'colorscheme monokai-nightasty' | execute 'MonokaiToggleLight'
 
+" Define the :Light command to switch back to the default monokai scheme
+command! Dark execute 'colorscheme monokai'
