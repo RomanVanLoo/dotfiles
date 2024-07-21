@@ -131,8 +131,11 @@ nnoremap <C-l> <C-w>l
 " Map Ctrl + p to open fuzzy find (FZF)
 nnoremap <c-p> :FZF!<cr>
 
-" Search in files (FZF)
-nnoremap <silent> <Leader>f :Rg<CR>
+" Search in files (Telescope)
+nnoremap <silent> <Leader>f :Telescope live_grep<CR>
+nnoremap <silent> <Leader>p :Telescope find_files<CR>
+nnoremap <silent> <Leader>q :copen<CR>
+
 set grepprg=rg\ --vimgrep\ --smart-case\ --follow
 
 " Set spellfile to location that is guaranteed to exist, can be symlinked to
@@ -145,7 +148,7 @@ set complete+=kspell
 " Always use vertical diffs
 if &diff
   set diffopt-=internal
-  set diffopt+=verical
+  set diffopt+=vertical
 endif
 
 " Local config
@@ -170,15 +173,18 @@ call plug#begin()
   Plug 'skanehira/preview-markdown.vim'
   Plug 'preservim/nerdtree'
   Plug 'thoughtbot/vim-rspec'
+  Plug 'nvim-telescope/telescope.nvim', { 'do': ':UpdateRemotePlugins' }
+  Plug 'nvim-lua/plenary.nvim'
   if has("nvim")
     " Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'tanvirtin/monokai.nvim'
     Plug 'polirritmico/monokai-nightasty.nvim'
     Plug 'f-person/git-blame.nvim'
+    Plug 'ribru17/bamboo.nvim'
     Plug 'github/copilot.vim'
+    Plug 'ryanoasis/vim-devicons'
   endif
 call plug#end()
-
 
 " TMUX
 let g:tmux_navigator_no_mappings = 1
@@ -218,7 +224,7 @@ map <Leader>y :call RunNearestSpec()<CR>
 let g:rspec_command = "!docker compose run --rm --name web-rspec web bundle exec rspec {spec}"
 
 " Set bar width for NERDTree
-let g:NERDTreeWinSize=60
+let g:NERDTreeWinSize=100
 let g:NERDTreeQuitOnOpen = 1
 let g:NERDTreeAutoDeleteBuffer = 1
 let g:NERDTreeMinimalUI = 1
@@ -241,8 +247,73 @@ let g:ale_fixers = {'ruby': ['standardrb'], 'typescript': ['eslint'], 'javascrip
 let g:ale_linters = {'ruby': ['standardrb']}
 let g:ale_fix_on_save = 1
 
-" Define the :Dark command to switch to monokai-nightasty and toggle light mode
-command! Light execute 'colorscheme monokai-nightasty' | execute 'MonokaiToggleLight'
+command! Dark call ResetColorScheme() | execute 'colorscheme monokai-nightasty' | execute 'MonokaiToggleLight'
+command! Light call ResetColorScheme() | execute 'colorscheme monokai'
 
-" Define the :Light command to switch back to the default monokai scheme
-command! Dark execute 'colorscheme monokai'
+" Telescope configuration
+lua << EOF
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
+local builtin = require('telescope.builtin')
+
+require('telescope').setup{
+  defaults = {
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case'
+    },
+    mappings = {
+      i = {
+        ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+        ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+        ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+      },
+      n = {
+        ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+        ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+        ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+      },
+    },
+    prompt_position = "bottom",
+    prompt_prefix = "> ",
+    selection_caret = "> ",
+    entry_prefix = "  ",
+    initial_mode = "insert",
+    selection_strategy = "reset",
+    sorting_strategy = "descending",
+    layout_strategy = "horizontal",
+    layout_config = {
+      horizontal = {
+        mirror = false,
+        preview_width = 0.5,
+      },
+      vertical = {
+        mirror = false,
+      },
+    },
+    file_sorter = require'telescope.sorters'.get_fuzzy_file,
+    file_ignore_patterns = {},
+    generic_sorter = require'telescope.sorters'.get_generic_fuzzy_sorter,
+    path_display = {"absolute"},
+    winblend = 0,
+    border = {},
+    borderchars = {'|', '|', '|', '|', '+', '+', '+', '+'},
+    color_devicons = true,
+    use_less = true,
+    set_env = { ['COLORTERM'] = 'truecolor' },
+    file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
+    grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
+    qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker,
+  }
+}
+
+-- Custom key mappings
+vim.api.nvim_set_keymap('n', '<leader>f', ':Telescope live_grep<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>q', ':copen<CR>', { noremap = true, silent = true })
+EOF
