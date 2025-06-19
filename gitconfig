@@ -29,7 +29,7 @@
 [diff]
   colorMoved = zebra
 [user]
-	name = roman
+	name = Roman
 	email = romanvanloo@icloud.com
 [filter "lfs"]
 	required = true

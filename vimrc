@@ -133,7 +133,6 @@ nnoremap <c-p> :FZF!<cr>
 
 " Search in files (Telescope)
 nnoremap <silent> <Leader>f :Telescope live_grep<CR>
-nnoremap <silent> <Leader>p :Telescope find_files<CR>
 nnoremap <silent> <Leader>q :copen<CR>
 
 set grepprg=rg\ --vimgrep\ --smart-case\ --follow
@@ -176,13 +175,14 @@ call plug#begin()
   Plug 'nvim-telescope/telescope.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'nvim-lua/plenary.nvim'
   if has("nvim")
-    " Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'nvim-treesitter/nvim-treesitter', { 'commit': '7958ff9', 'do': ':TSUpdate' }
     Plug 'tanvirtin/monokai.nvim'
     Plug 'polirritmico/monokai-nightasty.nvim'
     Plug 'f-person/git-blame.nvim'
     Plug 'ribru17/bamboo.nvim'
     Plug 'github/copilot.vim'
     Plug 'ryanoasis/vim-devicons'
+
   endif
 call plug#end()
 
@@ -255,6 +255,41 @@ lua << EOF
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local builtin = require('telescope.builtin')
+local themes = require('telescope.themes')
+
+-- Function to handle both relative and absolute paths
+local function smart_find_files()
+  local cwd = vim.fn.getcwd()
+  
+  builtin.find_files({
+    attach_mappings = function(prompt_bufnr, map)
+      -- Override the default selection action
+      local function smart_select()
+        local selection = action_state.get_selected_entry()
+        local filename = selection.filename or selection.value
+        
+        -- If it's an absolute path, use it directly
+        -- If it's relative, it will work normally
+        actions.select_default(prompt_bufnr)
+      end
+      
+      map('i', '<CR>', smart_select)
+      map('n', '<CR>', smart_select)
+      return true
+    end,
+    -- This allows telescope to find files using absolute paths
+    find_command = { "fd", "--type", "f", "--strip-cwd-prefix", "--absolute-path" },
+    -- Show both relative and absolute paths in results
+    path_display = function(opts, path)
+      local cwd = vim.fn.getcwd()
+      -- If path starts with cwd, show relative version
+      if string.find(path, cwd, 1, true) == 1 then
+        return string.sub(path, string.len(cwd) + 2)
+      end
+      return path
+    end,
+  })
+end
 
 require('telescope').setup{
   defaults = {
@@ -294,12 +329,14 @@ require('telescope').setup{
       },
       vertical = {
         mirror = false,
+        preview_cutoff = 0,
+        preview_height = 1,
       },
     },
     file_sorter = require'telescope.sorters'.get_fuzzy_file,
     file_ignore_patterns = {},
     generic_sorter = require'telescope.sorters'.get_generic_fuzzy_sorter,
-    path_display = {"absolute"},
+    path_display = {"smart"},
     winblend = 0,
     border = {},
     borderchars = {'|', '|', '|', '|', '+', '+', '+', '+'},
@@ -313,7 +350,8 @@ require('telescope').setup{
   }
 }
 
--- Custom key mappings
-vim.api.nvim_set_keymap('n', '<leader>f', ':Telescope live_grep<CR>', { noremap = true, silent = true })
+-- Custom key mappings with smart file finding
+vim.api.nvim_set_keymap('n', '<leader>p', ":lua smart_find_files()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>f', ":lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>q', ':copen<CR>', { noremap = true, silent = true })
 EOF
