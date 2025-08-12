@@ -112,6 +112,9 @@ nnoremap <silent> <Leader>gt :TestVisit<CR>
 " Run commands that require an interactive shell
 nnoremap <Leader>r :RunInInteractiveShell<Space>
 
+" Reset current file to match main branch
+command! ResetFileToMain execute '!git checkout main -- ' . shellescape(expand('%')) | edit
+
 " Treat <li> and <p> tags like the block tags they are
 let g:html_indent_tags = 'li\|p'
 
@@ -182,6 +185,7 @@ call plug#begin()
     Plug 'ribru17/bamboo.nvim'
     Plug 'github/copilot.vim'
     Plug 'ryanoasis/vim-devicons'
+    Plug 'morhetz/gruvbox'
 
   endif
 call plug#end()
@@ -198,7 +202,8 @@ let g:tmux_navigator_disable_when_zoomed = 1
 
 " Set monokai theme
 syntax enable
-colorscheme monokai
+colorscheme gruvbox
+set background=light
 
 " Vim-Commentary
 noremap \ :Commentary<CR>
@@ -239,16 +244,13 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-" Turn off git blame by default
-let g:gitblame_enabled = 0
+" Dont turn off git blame by default
+let g:gitblame_enabled = 1
 
 " ALE - Auto linting/fixing
 let g:ale_fixers = {'ruby': ['standardrb'], 'typescript': ['eslint'], 'javascript': ['eslint']}
 let g:ale_linters = {'ruby': ['standardrb']}
 let g:ale_fix_on_save = 1
-
-command! Dark call ResetColorScheme() | execute 'colorscheme monokai-nightasty' | execute 'MonokaiToggleLight'
-command! Light call ResetColorScheme() | execute 'colorscheme monokai'
 
 " Telescope configuration
 lua << EOF
@@ -354,4 +356,35 @@ require('telescope').setup{
 vim.api.nvim_set_keymap('n', '<leader>p', ":lua smart_find_files()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>f', ":lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>q', ':copen<CR>', { noremap = true, silent = true })
+
+-- Function to sync background with system theme using macOS defaults
+local function sync_background_with_system()
+  local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
+  if handle then
+    local result = handle:read("*a")
+    handle:close()
+
+    if result and result:match("Dark") then
+      vim.o.background = "dark"
+    else
+      vim.o.background = "dark"
+    end
+  end
+end
+
+-- Sync background on startup
+sync_background_with_system()
+
+-- Sync when Neovim gains focus (when you switch back to it)
+vim.api.nvim_create_autocmd({"FocusGained", "VimEnter"}, {
+  group = vim.api.nvim_create_augroup("SystemThemeSync", { clear = true }),
+  callback = sync_background_with_system,
+  desc = "Sync background with system theme"
+})
+
+-- Create a manual command to sync theme
+vim.api.nvim_create_user_command('SyncTheme', sync_background_with_system, {
+  desc = "Manually sync background with system theme"
+})
 EOF
+

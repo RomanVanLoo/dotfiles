@@ -1,0 +1,93 @@
+{
+  "allowedTools": [
+    {
+      "name": "terminal",
+      "permissions": ["execute", "read"],
+      "allowedCommands": [
+        "rails",
+        "bundle",
+        "rake",
+        "rspec",
+        "yarn",
+        "npm",
+        "mv",
+        "cp",
+        "mkdir",
+        "touch",
+        "echo",
+        "cat",
+        "find",
+        "grep",
+        "ls",
+        "ln",
+        "pwd",
+        "cd",
+        "rbenv",
+        "rvm",
+        "gem",
+        "pg_dump",
+        "psql",
+        "git",
+        "ssh-keygen",
+        "node",
+        "npx",
+        "webpacker",
+        "curl",
+        "wget",
+        "head",
+        "tail",
+        "test",
+        "diff",
+        "sort",
+        "uniq",
+        "wc",
+        "less",
+        "more",
+        "standardrb"
+      ]
+    },
+    {
+      "name": "filesystem",
+      "permissions": ["read", "write"],
+      "paths": [
+        "./**/*"
+      ],
+      "excludedPaths": [
+        "./config/master.key",
+        "./config/credentials.yml.enc",
+        "./storage/**/*"
+      ]
+    },
+    {
+      "name": "web",
+      "permissions": ["request"],
+      "allowedDomains": [
+        "rubygems.org",
+        "github.com",
+        "api.github.com",
+        "registry.npmjs.org",
+        "raw.githubusercontent.com",
+        "gist.github.com"
+      ]
+    }
+  ],
+  "disallowedCommands": [
+    "rm -rf /",
+    "rm -rf /*",
+    "rm -rf .",
+    "rm -rf ./",
+    "sudo",
+    "chmod 777",
+    ">",
+    "rails db:drop RAILS_ENV=production",
+    "rake db:drop RAILS_ENV=production"
+  ],
+  "compoundCommandRules": {
+    "disallowedPatterns": [
+      ".*\\brm\\s+-rf\\b(?!\\s+\\./tmp|\\s+\\./log|\\s+\\./node_modules).*",
+      ".*\\bchmod\\s+777\\b.*"
+    ]
+  },
+  "timeoutSeconds": 600,
+  "maxConcurrentTasks": 3
+}

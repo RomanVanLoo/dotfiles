@@ -107,6 +107,9 @@ alias lg="lazygit"
 alias be="bundle exec"
 alias co="git checkout"
 
+# Source aliases from dotfiles
+[[ -f ~/dotfiles/aliases ]] && source ~/dotfiles/aliases
+
 ZSH_THEME="powerlevel10k/powerlevel10k"
 source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
 
