@@ -122,3 +122,6 @@ eval "$(rbenv init -)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export JAVA_HOME='/usr/libexec/java_home -v 1.8.0_352'
+
+# Created by `pipx` on 2025-09-02 17:51:21
+export PATH="$PATH:/Users/romanvanloo/.local/bin"

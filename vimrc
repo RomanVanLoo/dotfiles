@@ -132,7 +132,70 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
 " Map Ctrl + p to open fuzzy find (FZF)
-nnoremap <c-p> :FZF!<cr>
+" Enhanced FZF that accepts absolute paths
+let $FZF_DEFAULT_COMMAND = 'find . -type f -not -path "*/\.git/*" 2>/dev/null | sed "s|^\./||"'
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split', 
+  \ 'ctrl-v': 'vsplit' }
+
+" Custom sink function that handles absolute paths and queries with actions
+function! SmartFileOpen(lines)
+  if len(a:lines) < 1
+    return
+  endif
+  
+  let query = a:lines[0]
+  let action = len(a:lines) > 1 ? a:lines[1] : ''
+  let file = len(a:lines) > 2 ? a:lines[2] : ''
+  
+  " If no file selected but query is an absolute path, use the query
+  if empty(file) && query =~ '^/' && filereadable(query)
+    let file = query
+  elseif empty(file) && !empty(action)
+    " When action is selected but no file, the action IS the file
+    let file = action
+    let action = ''
+  endif
+  
+  if empty(file)
+    return
+  endif
+  
+  " Determine the vim command based on action
+  let cmd = 'edit'
+  if action == 'ctrl-t'
+    let cmd = 'tabedit'
+  elseif action == 'ctrl-x'
+    let cmd = 'split'
+  elseif action == 'ctrl-v'
+    let cmd = 'vsplit'
+  endif
+  
+  " If it starts with / and exists, open it as absolute path
+  if file =~ '^/' && filereadable(file)
+    execute cmd . ' ' . fnameescape(file)
+  " If it starts with / but doesn't exist, extract filename and search for it
+  elseif file =~ '^/'
+    let basename = fnamemodify(file, ':t')
+    " Try to find file with same name in current project
+    let found = systemlist('find . -name "' . basename . '" -type f 2>/dev/null | head -1')
+    if len(found) > 0
+      execute cmd . ' ' . fnameescape(found[0])
+    else
+      echo "File not found: " . file
+    endif
+  else
+    " Normal relative path
+    execute cmd . ' ' . fnameescape(file)
+  endif
+endfunction
+
+" Use --print-query and --expect to capture both query and actions
+nnoremap <silent> <c-p> :call fzf#run(fzf#wrap({
+  \ 'sink*': function('SmartFileOpen'), 
+  \ 'options': '--print-query --expect=ctrl-t,ctrl-x,ctrl-v'
+  \ }))<cr>
 
 " Search in files (Telescope)
 nnoremap <silent> <Leader>f :Telescope live_grep<CR>
